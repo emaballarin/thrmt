@@ -18,7 +18,7 @@ def read(fname):
         return f.read().strip()
 
 
-PACKAGENAME: str = "thtmt"
+PACKAGENAME: str = "thrmt"
 
 setup(
     name=PACKAGENAME,
