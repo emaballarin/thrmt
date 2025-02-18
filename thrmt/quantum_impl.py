@@ -81,4 +81,4 @@ def random_obs_csu(
         size=size, dtype=dtype, device=device, batch_shape=batch_shape
     )
     ev: Tensor = evdist(*batch_shape, size, dtype=dtype, device=device)
-    return u @ ev @ u.transpose(-2, -1).conj()
+    return u @ th.diag_embed(ev) @ u.transpose(-2, -1).conj()
