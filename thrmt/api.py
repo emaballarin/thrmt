@@ -14,7 +14,9 @@ from .auxiliary import check_sigma
 from .auxiliary import check_size
 from .impl import random_coe as _random_coe
 from .impl import random_cue as _random_cue
+from .impl import random_gce as _random_gce
 from .impl import random_goe as _random_goe
+from .impl import random_gre as _random_gre
 from .impl import random_gue as _random_gue
 from .impl import random_jce as _random_jce
 from .impl import random_jre as _random_jre
@@ -29,7 +31,9 @@ from .types import real_dtypes
 __all__: List[str] = [
     "random_coe",  # Circular Orthogonal Ensemble
     "random_cue",  # Circular Unitary (Haar Uniform) Ensemble
+    "random_gce",  # Ginibre Complex Ensemble
     "random_goe",  # Gaussian (Hermite, or Wigner) Orthogonal Ensemble
+    "random_gre",  # Ginibre Real Ensemble
     "random_gue",  # Gaussian (Hermite, or Wigner) Unitary Ensemble
     "random_jce",  # Jacobi (MANOVA) Complex Ensemble
     "random_jre",  # Jacobi (MANOVA) Real Ensemble
@@ -41,9 +45,86 @@ __all__: List[str] = [
 # ~~ Functions ~~ ──────────────────────────────────────────────────────────────
 
 
+def random_gre(
+    size: int,
+    nnorm: bool = False,
+    dtype: th.dtype = th.double,
+    device: Optional[th.device] = None,
+    batch_shape: Optional[Tuple[int, ...]] = None,
+) -> Tensor:
+    """
+    Generate a random matrix (or a batch thereof) from the Ginibre Real Ensemble (GRE).
+
+    Parameters
+    ----------
+    size : int
+        The size of the square matrix.
+    nnorm : bool, optional
+        Normalize the matrix by the square root of its size. Default is False.
+    dtype : torch.dtype
+        The data type. Default is torch.double.
+    device : torch.device, optional
+        The device for the tensor. Default is None.
+    batch_shape : tuple of ints, optional
+        The batch shape for generating multiple matrices. Default is None.
+
+    Returns
+    -------
+    Tensor
+        A random GRE matrix of shape (*batch_shape, size, size).
+    """
+    check_size(size)
+    check_dtype(dtype, real_dtypes)
+    bs = () if batch_shape is None else batch_shape
+    return _random_gre(
+        size=size, nnorm=nnorm, dtype=dtype, device=device, batch_shape=bs
+    )
+
+
+def random_gce(
+    size: int,
+    nnorm: bool = False,
+    cnorm: bool = True,
+    dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
+    batch_shape: Optional[Tuple[int, ...]] = None,
+) -> Tensor:
+    """
+    Generate a random matrix (or a batch thereof) from the Ginibre Complex Ensemble (GCE).
+
+    Parameters
+    ----------
+    size : int
+        The size of the square matrix.
+    nnorm : bool, optional
+        Normalize the matrix by the square root of its size. Default is False.
+    cnorm : bool, optional
+        Normalize the matrix by the square root of 2. Default is True.
+    dtype : torch.dtype
+        The data type. Default is torch.cdouble.
+    device : torch.device, optional
+        The device for the tensor. Default is None.
+    batch_shape : tuple of ints, optional
+        The batch shape for generating multiple matrices. Default is None.
+
+    Returns
+    -------
+    Tensor
+        A random GCE matrix of shape (*batch_shape, size, size).
+    """
+    check_size(size)
+    check_dtype(dtype, complex_dtypes)
+    bs = () if batch_shape is None else batch_shape
+    return _random_gce(
+        size=size, nnorm=nnorm, cnorm=cnorm, dtype=dtype, device=device, batch_shape=bs
+    )
+
+
+# noinspection DuplicatedCode
 def random_cue(
     size: int,
     dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
     batch_shape: Optional[Tuple[int, ...]] = None,
 ) -> Tensor:
     """
@@ -56,6 +137,8 @@ def random_cue(
         The size of the square matrix.
     dtype : torch.dtype
         The data type. Default is torch.cdouble.
+    device : torch.device, optional
+        The device for the tensor. Default is None.
     batch_shape : tuple of ints, optional
         The batch shape for generating multiple matrices. For example, batch_shape=(B,)
         returns a tensor of shape (B, size, size). Default is None (i.e. a single matrix).
@@ -73,12 +156,13 @@ def random_cue(
     check_size(size)
     check_dtype(dtype, complex_dtypes)
     bs = () if batch_shape is None else batch_shape
-    return _random_cue(size=size, dtype=dtype, batch_shape=bs)
+    return _random_cue(size=size, dtype=dtype, device=device, batch_shape=bs)
 
 
 def random_coe(
     size: int,
     dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
     batch_shape: Optional[Tuple[int, ...]] = None,
 ) -> Tensor:
     """
@@ -90,6 +174,8 @@ def random_coe(
         The size of the square matrix.
     dtype : torch.dtype
         The data type. Default is torch.cdouble.
+    device : torch.device, optional
+        The device for the tensor. Default is None.
     batch_shape : tuple of ints, optional
         The batch shape for generating multiple matrices. Default is None.
 
@@ -101,13 +187,14 @@ def random_coe(
     check_size(size)
     check_dtype(dtype, complex_dtypes)
     bs = () if batch_shape is None else batch_shape
-    return _random_coe(size=size, dtype=dtype, batch_shape=bs)
+    return _random_coe(size=size, dtype=dtype, device=device, batch_shape=bs)
 
 
 def random_gue(
     size: int,
     sigma: float,
     dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
     batch_shape: Optional[Tuple[int, ...]] = None,
 ) -> Tensor:
     """
@@ -122,6 +209,8 @@ def random_gue(
         The scale parameter.
     dtype : torch.dtype
         The data type. Default is torch.cdouble.
+    device : torch.device, optional
+        The device for the tensor. Default is None.
     batch_shape : tuple of ints, optional
         The batch shape for generating multiple matrices. Default is None.
 
@@ -134,13 +223,16 @@ def random_gue(
     check_dtype(dtype, complex_dtypes)
     check_sigma(sigma)
     bs = () if batch_shape is None else batch_shape
-    return _random_gue(size=size, sigma=sigma, dtype=dtype, batch_shape=bs)
+    return _random_gue(
+        size=size, sigma=sigma, dtype=dtype, device=device, batch_shape=bs
+    )
 
 
 def random_goe(
     size: int,
     sigma: float,
     dtype: th.dtype = th.double,
+    device: Optional[th.device] = None,
     batch_shape: Optional[Tuple[int, ...]] = None,
 ) -> Tensor:
     """
@@ -155,6 +247,8 @@ def random_goe(
         The scale parameter.
     dtype : torch.dtype
         The data type. Default is torch.double.
+    device : torch.device, optional
+        The device for the tensor. Default is None.
     batch_shape : tuple of ints, optional
         The batch shape for generating multiple matrices. Default is None.
 
@@ -167,14 +261,18 @@ def random_goe(
     check_dtype(dtype, real_dtypes)
     check_sigma(sigma)
     bs = () if batch_shape is None else batch_shape
-    return _random_goe(size=size, sigma=sigma, dtype=dtype, batch_shape=bs)
+    return _random_goe(
+        size=size, sigma=sigma, dtype=dtype, device=device, batch_shape=bs
+    )
 
 
+# noinspection DuplicatedCode
 def random_wre(
     size_n: int,
     sigma: float,
     size_m: Optional[int] = None,
     dtype: th.dtype = th.double,
+    device: Optional[th.device] = None,
     batch_shape: Optional[Tuple[int, ...]] = None,
 ) -> Tensor:
     """
@@ -190,6 +288,8 @@ def random_wre(
         The number of columns. If None, defaults to size_n.
     dtype : torch.dtype
         The data type. Default is torch.double.
+    device : torch.device, optional
+        The device for the tensor. Default is None.
     batch_shape : tuple of ints, optional
         The batch shape for generating multiple matrices. Default is None.
 
@@ -204,15 +304,22 @@ def random_wre(
         check_size(size_m)
     bs = () if batch_shape is None else batch_shape
     return _random_wre(
-        size_n=size_n, sigma=sigma, size_m=size_m, dtype=dtype, batch_shape=bs
+        size_n=size_n,
+        sigma=sigma,
+        size_m=size_m,
+        dtype=dtype,
+        device=device,
+        batch_shape=bs,
     )
 
 
+# noinspection DuplicatedCode
 def random_wce(
     size_n: int,
     sigma: float,
     size_m: Optional[int] = None,
     dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
     batch_shape: Optional[Tuple[int, ...]] = None,
 ) -> Tensor:
     """
@@ -228,6 +335,8 @@ def random_wce(
         The number of columns. If None, defaults to size_n.
     dtype : torch.dtype
         The data type. Default is torch.cdouble.
+    device : torch.device, optional
+        The device for the tensor. Default is None.
     batch_shape : tuple of ints, optional
         The batch shape for generating multiple matrices. Default is None.
 
@@ -242,7 +351,12 @@ def random_wce(
         check_size(size_m)
     bs = () if batch_shape is None else batch_shape
     return _random_wce(
-        size_n=size_n, sigma=sigma, size_m=size_m, dtype=dtype, batch_shape=bs
+        size_n=size_n,
+        sigma=sigma,
+        size_m=size_m,
+        dtype=dtype,
+        device=device,
+        batch_shape=bs,
     )
 
 
@@ -252,6 +366,7 @@ def random_jre(
     size_m1: Optional[int] = None,
     size_m2: Optional[int] = None,
     dtype: th.dtype = th.double,
+    device: Optional[th.device] = None,
     batch_shape: Optional[Tuple[int, ...]] = None,
 ) -> Tensor:
     """
@@ -267,6 +382,8 @@ def random_jre(
         The number of columns of the second matrix. If None, defaults to size_n.
     dtype : torch.dtype
         The data type. Default is torch.double.
+    device : torch.device, optional
+        The device for the tensor. Default is None.
     batch_shape : tuple of ints, optional
         The batch shape for generating multiple matrices. Default is None.
 
@@ -283,7 +400,12 @@ def random_jre(
     check_dtype(dtype, real_dtypes)
     bs = () if batch_shape is None else batch_shape
     return _random_jre(
-        size_n=size_n, size_m1=size_m1, size_m2=size_m2, dtype=dtype, batch_shape=bs
+        size_n=size_n,
+        size_m1=size_m1,
+        size_m2=size_m2,
+        dtype=dtype,
+        device=device,
+        batch_shape=bs,
     )
 
 
@@ -293,6 +415,7 @@ def random_jce(
     size_m1: Optional[int] = None,
     size_m2: Optional[int] = None,
     dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
     batch_shape: Optional[Tuple[int, ...]] = None,
 ) -> Tensor:
     """
@@ -308,6 +431,8 @@ def random_jce(
         The number of columns of the second matrix. If None, defaults to size_n.
     dtype : torch.dtype
         The data type. Default is torch.cdouble.
+    device : torch.device, optional
+        The device for the tensor. Default is None.
     batch_shape : tuple of ints, optional
         The batch shape for generating multiple matrices. Default is None.
 
@@ -324,5 +449,10 @@ def random_jce(
     check_dtype(dtype, complex_dtypes)
     bs = () if batch_shape is None else batch_shape
     return _random_jce(
-        size_n=size_n, size_m1=size_m1, size_m2=size_m2, dtype=dtype, batch_shape=bs
+        size_n=size_n,
+        size_m1=size_m1,
+        size_m2=size_m2,
+        dtype=dtype,
+        device=device,
+        batch_shape=bs,
     )

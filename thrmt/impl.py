@@ -15,7 +15,9 @@ from torch import Tensor
 __all__: List[str] = [
     "random_coe",  # Circular Orthogonal Ensemble
     "random_cue",  # Circular Unitary (Haar Uniform) Ensemble
+    "random_gce",  # Ginibre Complex Ensemble
     "random_goe",  # Gaussian (Hermite, or Wigner) Orthogonal Ensemble
+    "random_gre",  # Ginibre Real Ensemble
     "random_gue",  # Gaussian (Hermite, or Wigner) Unitary Ensemble
     "random_jce",  # Jacobi (MANOVA) Complex Ensemble
     "random_jre",  # Jacobi (MANOVA) Real Ensemble
@@ -26,23 +28,61 @@ __all__: List[str] = [
 # ~~ Functions ~~ ──────────────────────────────────────────────────────────────
 
 
+def random_gre(
+    size: int,
+    nnorm: bool = False,
+    dtype: th.dtype = th.double,
+    device: Optional[th.device] = None,
+    batch_shape: Tuple[int, ...] = (),
+):
+    x: Tensor = th.randn(*batch_shape, size, size, dtype=dtype, device=device)
+    if nnorm:
+        x: Tensor = x / msqrt(size)
+    return x
+
+
+def random_gce(
+    size: int,
+    nnorm: bool = False,
+    cnorm: bool = True,
+    dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
+    batch_shape: Tuple[int, ...] = (),
+):
+    x: Tensor = th.randn(*batch_shape, size, size, dtype=dtype, device=device)
+    if nnorm and (not cnorm):
+        x: Tensor = x / msqrt(size / 2)
+    else:
+        if nnorm:
+            x: Tensor = x / msqrt(size)
+        if not cnorm:
+            x: Tensor = x * msqrt(2)
+    return x
+
+
 def random_cue(
     size: int,
     dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
-    a = th.randn(*batch_shape, size, size, dtype=dtype)
+    a: Tensor = random_gce(
+        size=size, dtype=dtype, device=device, batch_shape=batch_shape
+    )
     q, r = th.linalg.qr(a)
-    d = r.diagonal(dim1=-2, dim2=-1)
+    d: Tensor = r.diagonal(dim1=-2, dim2=-1)
     return q @ th.diag_embed(d / th.abs(d))
 
 
 def random_coe(
     size: int,
     dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
-    x = random_cue(size=size, dtype=dtype, batch_shape=batch_shape)
+    x: Tensor = random_cue(
+        size=size, dtype=dtype, device=device, batch_shape=batch_shape
+    )
     return x.transpose(-2, -1) @ x
 
 
@@ -50,9 +90,13 @@ def random_gue(
     size: int,
     sigma: float,
     dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
-    x = th.randn(*batch_shape, size, size, dtype=dtype) * sigma
+    x: Tensor = (
+        random_gce(size=size, dtype=dtype, device=device, batch_shape=batch_shape)
+        * sigma
+    )
     return (x + x.transpose(-2, -1).conj()) / msqrt(2)
 
 
@@ -60,9 +104,13 @@ def random_goe(
     size: int,
     sigma: float,
     dtype: th.dtype = th.double,
+    device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
-    x = th.randn(*batch_shape, size, size, dtype=dtype) * sigma
+    x: Tensor = (
+        random_gre(size=size, dtype=dtype, device=device, batch_shape=batch_shape)
+        * sigma
+    )
     return (x + x.transpose(-2, -1)) / msqrt(2)
 
 
@@ -71,10 +119,14 @@ def random_wre(
     sigma: float,
     size_m: Optional[int] = None,
     dtype: th.dtype = th.double,
+    device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
-    actual_size_m = size_m or size_n
-    x = th.randn(*batch_shape, size_n, actual_size_m, dtype=dtype) * sigma
+    actual_size_m: int = size_m or size_n
+    x: Tensor = (
+        th.randn(*batch_shape, size_n, actual_size_m, dtype=dtype, device=device)
+        * sigma
+    )
     return x @ x.transpose(-2, -1)
 
 
@@ -83,10 +135,14 @@ def random_wce(
     sigma: float,
     size_m: Optional[int] = None,
     dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
-    actual_size_m = size_m or size_n
-    x = th.randn(*batch_shape, size_n, actual_size_m, dtype=dtype) * sigma
+    actual_size_m: int = size_m or size_n
+    x: Tensor = (
+        th.randn(*batch_shape, size_n, actual_size_m, dtype=dtype, device=device)
+        * sigma
+    )
     return x @ x.transpose(-2, -1).conj()
 
 
@@ -95,14 +151,19 @@ def random_jre(
     size_m1: Optional[int] = None,
     size_m2: Optional[int] = None,
     dtype: th.dtype = th.double,
+    device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
-    actual_size_m1 = size_m1 or size_n
-    actual_size_m2 = size_m2 or size_n
-    x = th.randn(*batch_shape, size_n, actual_size_m1, dtype=dtype)
-    a1 = x @ x.transpose(-2, -1)
-    y = th.randn(*batch_shape, size_n, actual_size_m2, dtype=dtype)
-    a2 = a1 + y @ y.transpose(-2, -1)
+    actual_size_m1: int = size_m1 or size_n
+    actual_size_m2: int = size_m2 or size_n
+    x: Tensor = th.randn(
+        *batch_shape, size_n, actual_size_m1, dtype=dtype, device=device
+    )
+    a1: Tensor = x @ x.transpose(-2, -1)
+    y: Tensor = th.randn(
+        *batch_shape, size_n, actual_size_m2, dtype=dtype, device=device
+    )
+    a2: Tensor = a1 + y @ y.transpose(-2, -1)
     return a1 @ th.linalg.inv(a2)
 
 
@@ -111,12 +172,17 @@ def random_jce(
     size_m1: Optional[int] = None,
     size_m2: Optional[int] = None,
     dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
-    actual_size_m1 = size_m1 or size_n
-    actual_size_m2 = size_m2 or size_n
-    x = th.randn(*batch_shape, size_n, actual_size_m1, dtype=dtype)
-    a1 = x @ x.transpose(-2, -1).conj()
-    y = th.randn(*batch_shape, size_n, actual_size_m2, dtype=dtype)
-    a2 = a1 + y @ y.transpose(-2, -1).conj()
+    actual_size_m1: int = size_m1 or size_n
+    actual_size_m2: int = size_m2 or size_n
+    x: Tensor = th.randn(
+        *batch_shape, size_n, actual_size_m1, dtype=dtype, device=device
+    )
+    a1: Tensor = x @ x.transpose(-2, -1).conj()
+    y: Tensor = th.randn(
+        *batch_shape, size_n, actual_size_m2, dtype=dtype, device=device
+    )
+    a2: Tensor = a1 + y @ y.transpose(-2, -1).conj()
     return a1 @ th.linalg.inv(a2)

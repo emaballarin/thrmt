@@ -22,7 +22,7 @@ PACKAGENAME: str = "thrmt"
 
 setup(
     name=PACKAGENAME,
-    version="0.0.0",
+    version="0.0.1",
     author="Emanuele Ballarin",
     author_email="emanuele@ballarin.cc",
     url="https://github.com/emaballarin/thrmt",
@@ -34,6 +34,7 @@ setup(
         "Differentiable Programming",
         "Machine Learning",
         "PyTorch",
+        "Random Matrices",
         "Random Matrix Theory",
     ],
     license="MIT",
