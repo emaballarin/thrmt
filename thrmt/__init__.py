@@ -13,6 +13,8 @@ __all__: List[str] = [
     "random_gue",
     "random_jce",
     "random_jre",
+    "random_obs_csu",
+    "random_obs_gue",
     "random_rho_bh",
     "random_rho_hs",
     "random_wce",
@@ -35,6 +37,8 @@ from .api import random_wre
 # From quantum-specific API
 from .quantum_api import random_rho_hs
 from .quantum_api import random_rho_bh
+from .quantum_api import random_obs_csu
+from .quantum_api import random_obs_gue
 
 # From Aliases
 from .aliases import random_hcu

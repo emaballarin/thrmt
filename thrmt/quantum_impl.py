@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ~~ Imports ~~ ────────────────────────────────────────────────────────────────
+from collections.abc import Callable
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -10,11 +11,14 @@ from torch import Tensor
 
 from .impl import random_cue as _random_cue
 from .impl import random_gce as _random_gce
+from .impl import random_gue as _random_gue
 
 # ~~ Exports ~~ ────────────────────────────────────────────────────────────────
 __all__: List[str] = [
     "random_rho_hs",
     "random_rho_bh",
+    "random_obs_gue",
+    "random_obs_csu",
 ]
 
 
@@ -52,3 +56,29 @@ def random_rho_bh(
     x: Tensor = (beye + u) @ a
     aad: Tensor = x @ x.transpose(-2, -1).conj()
     return aad / aad.diagonal(offset=0, dim1=-2, dim2=-1).sum(-1)
+
+
+def random_obs_gue(
+    size: int,
+    sigma: float,
+    dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
+    batch_shape: Tuple[int, ...] = (),
+) -> Tensor:
+    return _random_gue(
+        size=size, sigma=sigma, dtype=dtype, device=device, batch_shape=batch_shape
+    )
+
+
+def random_obs_csu(
+    size: int,
+    evdist: Callable[..., Tensor],
+    dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
+    batch_shape: Tuple[int, ...] = (),
+) -> Tensor:
+    u: Tensor = _random_cue(
+        size=size, dtype=dtype, device=device, batch_shape=batch_shape
+    )
+    ev: Tensor = evdist(*batch_shape, size, dtype=dtype, device=device)
+    return u @ ev @ u.transpose(-2, -1).conj()

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # ~~ Imports ~~ ────────────────────────────────────────────────────────────────
+from collections.abc import Callable
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -11,6 +12,8 @@ from torch import Tensor
 
 from .auxiliary import check_dtype
 from .auxiliary import check_size
+from .quantum_impl import random_obs_csu as _random_obs_csu
+from .quantum_impl import random_obs_gue as _random_obs_gue
 from .quantum_impl import random_rho_bh as _random_rho_bh
 from .quantum_impl import random_rho_hs as _random_rho_hs
 from .types import complex_dtypes
@@ -19,6 +22,8 @@ from .types import complex_dtypes
 __all__: List[str] = [
     "random_rho_bh",
     "random_rho_hs",
+    "random_obs_csu",
+    "random_obs_gue",
 ]
 
 
@@ -84,3 +89,75 @@ def random_rho_bh(
     check_dtype(dtype, complex_dtypes)
     bs = () if batch_shape is None else batch_shape
     return _random_rho_bh(size=size, dtype=dtype, device=device, batch_shape=bs)
+
+
+def random_obs_csu(
+    size: int,
+    evdist: Callable[..., Tensor],
+    dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
+    batch_shape: Optional[Tuple[int, ...]] = None,
+) -> Tensor:
+    """
+    Generate a random observable (or a batch thereof) uniformly in a compact set from the distribution of eigenvalues.
+
+    Parameters
+    ----------
+    size : int
+        The size of the square matrix.
+    evdist : Callable[..., Tensor]
+        A function to sample from distribution of eigenvalues. Must implement the Torch API.
+    dtype : torch.dtype
+        The data type. Default is torch.double.
+    device : torch.device, optional
+        The device. Default is None.
+    batch_shape : tuple of ints, optional
+        The batch shape for generating multiple matrices. Default is None.
+
+    Returns
+    -------
+    Tensor
+        A random observable (or a batch thereof) uniformly w.r.t. the CSU measure.
+    """
+    check_size(size)
+    check_dtype(dtype, complex_dtypes)
+    bs = () if batch_shape is None else batch_shape
+    return _random_obs_csu(
+        size=size, evdist=evdist, dtype=dtype, device=device, batch_shape=bs
+    )
+
+
+def random_obs_gue(
+    size: int,
+    sigma: float,
+    dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
+    batch_shape: Optional[Tuple[int, ...]] = None,
+) -> Tensor:
+    """
+    Generate a random observable (or a batch thereof) uniformly in the Gaussian Unitary Ensemble.
+
+    Parameters
+    ----------
+    size : int
+        The size of the square matrix.
+    sigma : float
+        The scale parameter.
+    dtype : torch.dtype
+        The data type. Default is torch.double.
+    device : torch.device, optional
+        The device. Default is None.
+    batch_shape : tuple of ints, optional
+        The batch shape for generating multiple matrices. Default is None.
+
+    Returns
+    -------
+    Tensor
+        A random observable (or a batch thereof) uniformly w.r.t. the GUE measure.
+    """
+    check_size(size)
+    check_dtype(dtype, complex_dtypes)
+    bs = () if batch_shape is None else batch_shape
+    return _random_obs_gue(
+        size=size, sigma=sigma, dtype=dtype, device=device, batch_shape=bs
+    )
