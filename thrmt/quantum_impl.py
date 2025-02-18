@@ -31,7 +31,7 @@ def random_rho_hs(
         size=size, dtype=dtype, device=device, batch_shape=batch_shape
     )
     aad: Tensor = x @ x.transpose(-2, -1).conj()
-    return aad / th.trace(aad)
+    return aad / aad.diagonal(offset=0, dim1=-2, dim2=-1).sum(-1)
 
 
 def random_rho_bh(
@@ -51,4 +51,4 @@ def random_rho_bh(
     )
     x: Tensor = (beye + u) @ a
     aad: Tensor = x @ x.transpose(-2, -1).conj()
-    return aad / th.trace(aad)
+    return aad / aad.diagonal(offset=0, dim1=-2, dim2=-1).sum(-1)
