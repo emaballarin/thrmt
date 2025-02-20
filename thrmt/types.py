@@ -10,6 +10,7 @@ import torch as th
 __all__: List[str] = [
     "complex_dtypes",
     "real_dtypes",
+    "c2r_map",
 ]
 
 # ~~ dtypes ~~ ─────────────────────────────────────────────────────────────────
@@ -36,3 +37,13 @@ real_dtypes: List[th.dtype] = [
     th.float,
     th.double,
 ]
+
+# ~~ dtype-maps ~~ ─────────────────────────────────────────────────────────────
+c2r_map: dict[th.dtype, th.dtype] = {
+    th.cdouble: th.double,
+    th.cfloat: th.float,
+    th.chalf: th.half,
+    th.complex128: th.float64,
+    th.complex32: th.float16,
+    th.complex64: th.float32,
+}

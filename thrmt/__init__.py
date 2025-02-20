@@ -39,6 +39,7 @@ from .quantum_api import random_rho_hs
 from .quantum_api import random_rho_bh
 from .quantum_api import random_obs_csu
 from .quantum_api import random_obs_gue
+from .quantum_api import random_obs_cgi
 
 # From Aliases
 from .aliases import random_hcu

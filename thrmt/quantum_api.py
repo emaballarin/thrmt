@@ -10,8 +10,10 @@ from typing import Tuple
 import torch as th
 from torch import Tensor
 
+from .auxiliary import check_bounds
 from .auxiliary import check_dtype
 from .auxiliary import check_size
+from .gellmann_impl import random_obs_cgi as _random_obs_cgi
 from .quantum_impl import random_obs_csu as _random_obs_csu
 from .quantum_impl import random_obs_gue as _random_obs_gue
 from .quantum_impl import random_rho_bh as _random_rho_bh
@@ -24,6 +26,7 @@ __all__: List[str] = [
     "random_rho_hs",
     "random_obs_csu",
     "random_obs_gue",
+    "random_obs_cgi",
 ]
 
 
@@ -160,4 +163,49 @@ def random_obs_gue(
     bs = () if batch_shape is None else batch_shape
     return _random_obs_gue(
         size=size, sigma=sigma, dtype=dtype, device=device, batch_shape=bs
+    )
+
+
+def random_obs_cgi(
+    size: int,
+    coeff_low: float = 0.0,
+    coeff_upp: float = 1.0,
+    dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
+    batch_shape: Optional[Tuple[int, ...]] = None,
+) -> Tensor:
+    """
+    Generate a random observable (or a batch thereof) uniformly in the Gell-Mann parameterization of unitaries.
+
+    Parameters
+    ----------
+    size : int
+        The size of the square matrix.
+    coeff_low : float, optional
+        The lower bound for the coefficients. Default is 0.0.
+    coeff_upp : float, optional
+        The upper bound for the coefficients. Default is 1.0.
+    dtype : torch.dtype
+        The data type. Default is torch.double.
+    device : torch.device, optional
+        The device. Default is None.
+    batch_shape : tuple of ints, optional
+        The batch shape for generating multiple matrices. Default is None.
+
+    Returns
+    -------
+    Tensor
+        A random observable (or a batch thereof) uniformly w.r.t. the CGI measure.
+    """
+    check_size(size, disallow_equality=True)
+    check_bounds(coeff_low, coeff_upp)
+    check_dtype(dtype, complex_dtypes)
+    bs = () if batch_shape is None else batch_shape
+    return _random_obs_cgi(
+        size=size,
+        coeff_low=coeff_low,
+        coeff_upp=coeff_upp,
+        dtype=dtype,
+        device=device,
+        batch_shape=bs,
     )
