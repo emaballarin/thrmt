@@ -175,7 +175,7 @@ def random_obs_cgi(
     batch_shape: Optional[Tuple[int, ...]] = None,
 ) -> Tensor:
     """
-    Generate a random observable (or a batch thereof) uniformly in the Gell-Mann parameterization of unitaries.
+    Generate a random observable (or a batch thereof) uniformly in the Gell-Mann parameterization of Hermitians.
 
     Parameters
     ----------
