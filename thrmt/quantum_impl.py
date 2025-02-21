@@ -98,4 +98,4 @@ def random_rho_pure(
     p = p / th.linalg.norm(p, dim=-1, keepdim=True)
     if batch_shape == ():
         return th.outer(p, p.t().conj())
-    return batched_outer(p, p.t().conj(), use_einsum=bo_einsum)
+    return batched_outer(p, p.transpose(-2, -1).conj(), use_einsum=bo_einsum)
