@@ -18,6 +18,7 @@ from .quantum_impl import random_obs_csu as _random_obs_csu
 from .quantum_impl import random_obs_gue as _random_obs_gue
 from .quantum_impl import random_rho_bh as _random_rho_bh
 from .quantum_impl import random_rho_hs as _random_rho_hs
+from .quantum_impl import random_rho_pure as _random_rho_pure
 from .types import complex_dtypes
 
 # ~~ Exports ~~ ────────────────────────────────────────────────────────────────
@@ -27,6 +28,7 @@ __all__: List[str] = [
     "random_obs_csu",
     "random_obs_gue",
     "random_obs_cgi",
+    "random_rho_pure",
 ]
 
 
@@ -208,4 +210,25 @@ def random_obs_cgi(
         dtype=dtype,
         device=device,
         batch_shape=bs,
+    )
+
+
+def random_rho_pure(
+    size: int,
+    dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
+    batch_shape: Optional[Tuple[int, ...]] = None,
+    *,
+    bo_einsum: bool = False,
+):
+    # TODO: Write docs!
+    check_size(size)
+    check_dtype(dtype, complex_dtypes)
+    bs = () if batch_shape is None else batch_shape
+    return _random_rho_pure(
+        size=size,
+        dtype=dtype,
+        device=device,
+        batch_shape=bs,
+        bo_einsum=bo_einsum,
     )

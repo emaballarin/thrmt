@@ -9,6 +9,7 @@ from typing import Tuple
 import torch as th
 from torch import Tensor
 
+from .core import batched_outer
 from .impl import random_cue as _random_cue
 from .impl import random_gce as _random_gce
 from .impl import random_gue as _random_gue
@@ -19,6 +20,7 @@ __all__: List[str] = [
     "random_rho_bh",
     "random_obs_gue",
     "random_obs_csu",
+    "random_rho_pure",
 ]
 
 
@@ -82,3 +84,18 @@ def random_obs_csu(
     )
     ev: Tensor = evdist(*batch_shape, size, dtype=dtype, device=device)
     return u @ th.diag_embed(ev) @ u.transpose(-2, -1).conj()
+
+
+def random_rho_pure(
+    size: int,
+    dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
+    batch_shape: Tuple[int, ...] = (),
+    *,
+    bo_einsum: bool = False,
+):
+    p: Tensor = th.randn(*batch_shape, size, dtype=dtype, device=device)
+    p = p / th.linalg.norm(p, dim=-1, keepdim=True)
+    if batch_shape == ():
+        return th.outer(p, p.t().conj())
+    return batched_outer(p, p.t().conj(), use_einsum=bo_einsum)

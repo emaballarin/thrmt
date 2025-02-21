@@ -19,6 +19,8 @@ __all__: List[str] = [
     "random_rho_hs",
     "random_wce",
     "random_wre",
+    "random_obs_cgi",
+    "random_rho_pure",
 ]
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -40,6 +42,7 @@ from .quantum_api import random_rho_bh
 from .quantum_api import random_obs_csu
 from .quantum_api import random_obs_gue
 from .quantum_api import random_obs_cgi
+from .quantum_api import random_rho_pure
 
 # From Aliases
 from .aliases import random_hcu
