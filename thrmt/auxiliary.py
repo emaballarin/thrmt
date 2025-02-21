@@ -5,7 +5,6 @@
 from typing import List
 
 import torch as th
-from torch import Tensor
 
 # ~~ Exports ~~ ────────────────────────────────────────────────────────────────
 __all__: List[str] = [
