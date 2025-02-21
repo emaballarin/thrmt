@@ -220,7 +220,7 @@ def random_rho_pure(
     batch_shape: Optional[Tuple[int, ...]] = None,
     *,
     bo_einsum: bool = False,
-):
+) -> Tensor:
     # TODO: Write docs!
     check_size(size)
     check_dtype(dtype, complex_dtypes)
