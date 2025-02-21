@@ -97,5 +97,5 @@ def random_rho_pure(
     p: Tensor = th.randn(*batch_shape, size, dtype=dtype, device=device)
     p = p / th.linalg.norm(p, dim=-1, keepdim=True)
     if batch_shape == ():
-        return th.outer(p, p.t().conj())
-    return batched_outer(p, p.transpose(-2, -1).conj(), use_einsum=bo_einsum)
+        return th.outer(p, p.conj())
+    return batched_outer(p, p.conj(), use_einsum=bo_einsum)
