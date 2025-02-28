@@ -45,9 +45,14 @@ def random_rho_bh(
     dtype: th.dtype = th.cdouble,
     device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
+    random_phases: bool = False,
 ):
     u: Tensor = _random_cue(
-        size=size, dtype=dtype, device=device, batch_shape=batch_shape
+        size=size,
+        dtype=dtype,
+        device=device,
+        batch_shape=batch_shape,
+        random_phases=random_phases,
     )
     a: Tensor = _random_gce(
         size=size, dtype=dtype, device=device, batch_shape=batch_shape
@@ -78,9 +83,14 @@ def random_obs_csu(
     dtype: th.dtype = th.cdouble,
     device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
+    random_phases: bool = False,
 ) -> Tensor:
     u: Tensor = _random_cue(
-        size=size, dtype=dtype, device=device, batch_shape=batch_shape
+        size=size,
+        dtype=dtype,
+        device=device,
+        batch_shape=batch_shape,
+        random_phases=random_phases,
     )
     ev: Tensor = evdist(*batch_shape, size, dtype=dtype, device=device)
     return u @ th.diag_embed(ev) @ u.transpose(-2, -1).conj()

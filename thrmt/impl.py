@@ -10,6 +10,8 @@ from typing import Tuple
 import torch as th
 from torch import Tensor
 
+from .types import c2r_map
+
 # ~~ Exports ~~ ────────────────────────────────────────────────────────────────
 
 __all__: List[str] = [
@@ -65,13 +67,23 @@ def random_cue(
     dtype: th.dtype = th.cdouble,
     device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
+    random_phases: bool = False,
 ) -> Tensor:
     a: Tensor = random_gce(
         size=size, dtype=dtype, device=device, batch_shape=batch_shape
     )
     q, r = th.linalg.qr(a)
-    d: Tensor = r.diagonal(dim1=-2, dim2=-1)
-    return q @ th.diag_embed(d / th.abs(d))
+    if random_phases:
+        d: Tensor = th.exp(
+            1j
+            * 2
+            * th.pi
+            * th.rand(*batch_shape, size, dtype=c2r_map[dtype], device=device)
+        )
+    else:
+        d: Tensor = r.diagonal(dim1=-2, dim2=-1)
+        d: Tensor = d / th.abs(d)
+    return q @ th.diag_embed(d)
 
 
 def random_coe(
@@ -79,9 +91,14 @@ def random_coe(
     dtype: th.dtype = th.cdouble,
     device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
+    random_phases: bool = False,
 ) -> Tensor:
     x: Tensor = random_cue(
-        size=size, dtype=dtype, device=device, batch_shape=batch_shape
+        size=size,
+        dtype=dtype,
+        device=device,
+        batch_shape=batch_shape,
+        random_phases=random_phases,
     )
     return x.transpose(-2, -1) @ x
 

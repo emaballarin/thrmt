@@ -70,6 +70,7 @@ def random_rho_bh(
     dtype: th.dtype = th.cdouble,
     device: Optional[th.device] = None,
     batch_shape: Optional[Tuple[int, ...]] = None,
+    random_phases: bool = False,
 ) -> Tensor:
     """
     Generate a random quantum state (or a batch thereof) uniformly w.r.t. the Bures-Helstrom measure.
@@ -84,6 +85,8 @@ def random_rho_bh(
         The device. Default is None.
     batch_shape : tuple of ints, optional
         The batch shape for generating multiple matrices. Default is None.
+    random_phases : bool, optional
+        Use uniform random phases for piecewise correction within QR decomposition. Default is False.
 
     Returns
     -------
@@ -93,7 +96,13 @@ def random_rho_bh(
     check_size(size)
     check_dtype(dtype, complex_dtypes)
     bs = () if batch_shape is None else batch_shape
-    return _random_rho_bh(size=size, dtype=dtype, device=device, batch_shape=bs)
+    return _random_rho_bh(
+        size=size,
+        dtype=dtype,
+        device=device,
+        batch_shape=bs,
+        random_phases=random_phases,
+    )
 
 
 def random_obs_csu(
@@ -102,6 +111,7 @@ def random_obs_csu(
     dtype: th.dtype = th.cdouble,
     device: Optional[th.device] = None,
     batch_shape: Optional[Tuple[int, ...]] = None,
+    random_phases: bool = False,
 ) -> Tensor:
     """
     Generate a random observable (or a batch thereof) uniformly in a compact set from the distribution of eigenvalues.
@@ -118,6 +128,8 @@ def random_obs_csu(
         The device. Default is None.
     batch_shape : tuple of ints, optional
         The batch shape for generating multiple matrices. Default is None.
+    random_phases : bool, optional
+        Use uniform random phases for piecewise correction within QR decomposition. Default is False.
 
     Returns
     -------
@@ -128,7 +140,12 @@ def random_obs_csu(
     check_dtype(dtype, complex_dtypes)
     bs = () if batch_shape is None else batch_shape
     return _random_obs_csu(
-        size=size, evdist=evdist, dtype=dtype, device=device, batch_shape=bs
+        size=size,
+        evdist=evdist,
+        dtype=dtype,
+        device=device,
+        batch_shape=bs,
+        random_phases=random_phases,
     )
 
 
@@ -221,7 +238,27 @@ def random_rho_pure(
     *,
     bo_einsum: bool = False,
 ) -> Tensor:
-    # TODO: Write docs!
+    """
+    Generate a random pure quantum state (or a batch thereof).
+
+    Parameters
+    ----------
+    size : int
+        The size of the square matrix.
+    dtype : torch.dtype
+        The data type. Default is torch.double.
+    device : torch.device, optional
+        The device. Default is None.
+    batch_shape : tuple of ints, optional
+        The batch shape for generating multiple matrices. Default is None.
+    bo_einsum : bool, optional
+        If True, use einsum for batched outer product. Default is False.
+
+    Returns
+    -------
+    Tensor
+        A random pure quantum state (or a batch thereof).
+    """
     check_size(size)
     check_dtype(dtype, complex_dtypes)
     bs = () if batch_shape is None else batch_shape

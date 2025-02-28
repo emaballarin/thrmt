@@ -11,6 +11,7 @@ __all__: List[str] = [
     "complex_dtypes",
     "real_dtypes",
     "c2r_map",
+    "r2c_map",
 ]
 
 # ~~ dtypes ~~ ─────────────────────────────────────────────────────────────────
@@ -26,6 +27,8 @@ complex_dtypes: List[th.dtype] = [
 
 real_dtypes: List[th.dtype] = [
     th.bfloat16,
+    th.double,
+    th.float,
     th.float16,
     th.float32,
     th.float64,
@@ -34,8 +37,6 @@ real_dtypes: List[th.dtype] = [
     th.float8_e5m2,
     th.float8_e5m2fnuz,
     th.half,
-    th.float,
-    th.double,
 ]
 
 # ~~ dtype-maps ~~ ─────────────────────────────────────────────────────────────
@@ -46,4 +47,18 @@ c2r_map: dict[th.dtype, th.dtype] = {
     th.complex128: th.float64,
     th.complex32: th.float16,
     th.complex64: th.float32,
+}
+
+r2c_map: dict[th.dtype, th.dtype] = {
+    th.bfloat16: th.complex32,
+    th.double: th.cdouble,
+    th.float16: th.complex32,
+    th.float32: th.complex64,
+    th.float64: th.complex128,
+    th.float8_e4m3fn: th.complex32,
+    th.float8_e4m3fnuz: th.complex32,
+    th.float8_e5m2: th.complex32,
+    th.float8_e5m2fnuz: th.complex32,
+    th.float: th.cfloat,
+    th.half: th.chalf,
 }

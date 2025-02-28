@@ -126,6 +126,7 @@ def random_cue(
     dtype: th.dtype = th.cdouble,
     device: Optional[th.device] = None,
     batch_shape: Optional[Tuple[int, ...]] = None,
+    random_phases: bool = False,
 ) -> Tensor:
     """
     Generate a random unitary matrix (or a batch thereof) from the Circular Unitary Ensemble (CUE),
@@ -142,6 +143,8 @@ def random_cue(
     batch_shape : tuple of ints, optional
         The batch shape for generating multiple matrices. For example, batch_shape=(B,)
         returns a tensor of shape (B, size, size). Default is None (i.e. a single matrix).
+    random_phases : bool, optional
+        Use uniform random phases for piecewise correction within QR decomposition. Default is False.
 
     Returns
     -------
@@ -156,7 +159,13 @@ def random_cue(
     check_size(size)
     check_dtype(dtype, complex_dtypes)
     bs = () if batch_shape is None else batch_shape
-    return _random_cue(size=size, dtype=dtype, device=device, batch_shape=bs)
+    return _random_cue(
+        size=size,
+        dtype=dtype,
+        device=device,
+        batch_shape=bs,
+        random_phases=random_phases,
+    )
 
 
 def random_coe(
@@ -164,6 +173,7 @@ def random_coe(
     dtype: th.dtype = th.cdouble,
     device: Optional[th.device] = None,
     batch_shape: Optional[Tuple[int, ...]] = None,
+    random_phases: bool = False,
 ) -> Tensor:
     """
     Generate a random matrix (or a batch thereof) from the Circular Orthogonal Ensemble (COE).
@@ -178,6 +188,8 @@ def random_coe(
         The device for the tensor. Default is None.
     batch_shape : tuple of ints, optional
         The batch shape for generating multiple matrices. Default is None.
+    random_phases : bool, optional
+        Use uniform random phases for piecewise correction within QR decomposition. Default is False.
 
     Returns
     -------
@@ -187,7 +199,13 @@ def random_coe(
     check_size(size)
     check_dtype(dtype, complex_dtypes)
     bs = () if batch_shape is None else batch_shape
-    return _random_coe(size=size, dtype=dtype, device=device, batch_shape=bs)
+    return _random_coe(
+        size=size,
+        dtype=dtype,
+        device=device,
+        batch_shape=bs,
+        random_phases=random_phases,
+    )
 
 
 def random_gue(
