@@ -20,6 +20,7 @@ from .impl import random_gre as _random_gre
 from .impl import random_gue as _random_gue
 from .impl import random_jce as _random_jce
 from .impl import random_jre as _random_jre
+from .impl import random_phd as _random_phd
 from .impl import random_wce as _random_wce
 from .impl import random_wre as _random_wre
 from .types import complex_dtypes
@@ -39,6 +40,7 @@ __all__: List[str] = [
     "random_jre",  # Jacobi (MANOVA) Real Ensemble
     "random_wce",  # Wishart (Laguerre) Complex Ensemble
     "random_wre",  # Wishart (Laguerre) Real Ensemble
+    "random_phd",  # Diagonal matrix with random PHases
 ]
 
 
@@ -150,11 +152,6 @@ def random_cue(
     -------
     Tensor
         A random unitary matrix of shape (*batch_shape, size, size).
-
-    Raises
-    ------
-    ValueError
-        If size is less than 1 or dtype is invalid.
     """
     check_size(size)
     check_dtype(dtype, complex_dtypes)
@@ -474,3 +471,34 @@ def random_jce(
         device=device,
         batch_shape=bs,
     )
+
+
+def random_phd(
+    size: int,
+    dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
+    batch_shape: Optional[Tuple[int, ...]] = None,
+):
+    """
+    Generate a diagonal random-phases matrix (or a batch thereof).
+
+    Parameters
+    ----------
+    size : int
+        The size of the square matrix.
+    dtype : torch.dtype
+        The data type. Default is torch.cdouble.
+    device : torch.device, optional
+        The device for the tensor. Default is None.
+    batch_shape : tuple of ints, optional
+        The batch shape for generating multiple matrices. Default is None.
+
+    Returns
+    -------
+    Tensor
+        A random diagonal-phases matrix of shape (*batch_shape, size, size).
+    """
+    check_size(size)
+    check_dtype(dtype, complex_dtypes)
+    bs = () if batch_shape is None else batch_shape
+    return _random_phd(size=size, dtype=dtype, device=device, batch_shape=bs)

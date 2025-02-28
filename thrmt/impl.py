@@ -25,6 +25,7 @@ __all__: List[str] = [
     "random_jre",  # Jacobi (MANOVA) Real Ensemble
     "random_wce",  # Wishart (Laguerre) Complex Ensemble
     "random_wre",  # Wishart (Laguerre) Real Ensemble
+    "random_phd",  # Diagonal matrix with random PHases
 ]
 
 # ~~ Functions ~~ ──────────────────────────────────────────────────────────────
@@ -62,6 +63,22 @@ def random_gce(
     return x
 
 
+def random_phd(
+    size: int,
+    dtype: th.dtype = th.cdouble,
+    device: Optional[th.device] = None,
+    batch_shape: Tuple[int, ...] = (),
+) -> Tensor:
+    return th.diag_embed(
+        th.exp(
+            1j
+            * 2
+            * th.pi
+            * th.rand(*batch_shape, size, dtype=c2r_map[dtype], device=device)
+        )
+    )
+
+
 def random_cue(
     size: int,
     dtype: th.dtype = th.cdouble,
@@ -74,16 +91,13 @@ def random_cue(
     )
     q, r = th.linalg.qr(a)
     if random_phases:
-        d: Tensor = th.exp(
-            1j
-            * 2
-            * th.pi
-            * th.rand(*batch_shape, size, dtype=c2r_map[dtype], device=device)
+        d: Tensor = random_phd(
+            size=size, dtype=dtype, device=device, batch_shape=batch_shape
         )
     else:
         d: Tensor = r.diagonal(dim1=-2, dim2=-1)
-        d: Tensor = d / th.abs(d)
-    return q @ th.diag_embed(d)
+        d: Tensor = th.diag_embed(d / th.abs(d))
+    return q @ d
 
 
 def random_coe(

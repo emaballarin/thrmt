@@ -22,7 +22,7 @@ PACKAGENAME: str = "thrmt"
 
 setup(
     name=PACKAGENAME,
-    version="0.0.12",
+    version="0.0.13",
     author="Emanuele Ballarin",
     author_email="emanuele@ballarin.cc",
     url="https://github.com/emaballarin/thrmt",
