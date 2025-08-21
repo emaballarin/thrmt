@@ -154,7 +154,6 @@ def random_cue(
         A random unitary matrix of shape (*batch_shape, size, size).
     """
     check_size(size)
-    check_dtype(dtype, complex_dtypes)
     bs = () if batch_shape is None else batch_shape
     return _random_cue(
         size=size,
