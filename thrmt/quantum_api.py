@@ -180,9 +180,7 @@ def random_obs_gue(
     check_size(size)
     check_dtype(dtype, complex_dtypes)
     bs = () if batch_shape is None else batch_shape
-    return _random_obs_gue(
-        size=size, sigma=sigma, dtype=dtype, device=device, batch_shape=bs
-    )
+    return _random_obs_gue(size=size, sigma=sigma, dtype=dtype, device=device, batch_shape=bs)
 
 
 def random_obs_cgi(

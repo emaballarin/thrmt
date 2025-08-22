@@ -12,6 +12,7 @@ import torch as th
 from torch import Tensor
 
 from .types import c2r_map
+from .types import complex_dtypes
 
 # ~~ Exports ~~ ────────────────────────────────────────────────────────────────
 __all__: List[str] = [
@@ -63,13 +64,12 @@ def random_obs_cgi(
 
     batch_size: Tuple[int, ...] = batch_shape if batch_shape else (1,)
     random_coeffs: Tensor = (coeff_upp - coeff_low) * th.rand(
-        *batch_size, size * size - 1, dtype=c2r_map[dtype], device=device
+        *batch_size, size * size - 1, dtype=(c2r_map[dtype] if dtype in complex_dtypes else dtype), device=device
     ) + coeff_low
 
     result: Tensor = (
         sum(  # type: ignore
-            random_coeffs[..., i, None, None] * m
-            for i, m in enumerate(gell_mann_matrices)
+            random_coeffs[..., i, None, None] * m for i, m in enumerate(gell_mann_matrices)
         )
         + th.eye(size, dtype=dtype, device=device) / size
     )

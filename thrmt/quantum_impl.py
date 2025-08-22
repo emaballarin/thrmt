@@ -33,9 +33,7 @@ def random_rho_hs(
     device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
 ):
-    x: Tensor = _random_gce(
-        size=size, dtype=dtype, device=device, batch_shape=batch_shape
-    )
+    x: Tensor = _random_gce(size=size, dtype=dtype, device=device, batch_shape=batch_shape)
     aad: Tensor = x @ x.transpose(-2, -1).conj()
     return aad / aad.diagonal(offset=0, dim1=-2, dim2=-1).sum(-1)
 
@@ -54,12 +52,8 @@ def random_rho_bh(
         batch_shape=batch_shape,
         random_phases=random_phases,
     )
-    a: Tensor = _random_gce(
-        size=size, dtype=dtype, device=device, batch_shape=batch_shape
-    )
-    beye: Tensor = th.diag_embed(
-        th.ones(*batch_shape, size, dtype=dtype, device=device)
-    )
+    a: Tensor = _random_gce(size=size, dtype=dtype, device=device, batch_shape=batch_shape)
+    beye: Tensor = th.diag_embed(th.ones(*batch_shape, size, dtype=dtype, device=device))
     x: Tensor = (beye + u) @ a
     aad: Tensor = x @ x.transpose(-2, -1).conj()
     return aad / aad.diagonal(offset=0, dim1=-2, dim2=-1).sum(-1)
@@ -72,9 +66,7 @@ def random_obs_gue(
     device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
-    return _random_gue(
-        size=size, sigma=sigma, dtype=dtype, device=device, batch_shape=batch_shape
-    )
+    return _random_gue(size=size, sigma=sigma, dtype=dtype, device=device, batch_shape=batch_shape)
 
 
 def random_obs_csu(

@@ -11,6 +11,7 @@ import torch as th
 from torch import Tensor
 
 from .types import c2r_map
+from .types import complex_dtypes
 
 # ~~ Exports ~~ ────────────────────────────────────────────────────────────────
 
@@ -74,7 +75,7 @@ def random_phd(
             1j
             * 2
             * th.pi
-            * th.rand(*batch_shape, size, dtype=c2r_map[dtype], device=device)
+            * th.rand(*batch_shape, size, dtype=(c2r_map[dtype] if dtype in complex_dtypes else dtype), device=device)
         )
     )
 
@@ -86,14 +87,10 @@ def random_cue(
     batch_shape: Tuple[int, ...] = (),
     random_phases: bool = False,
 ) -> Tensor:
-    a: Tensor = random_gce(
-        size=size, dtype=dtype, device=device, batch_shape=batch_shape
-    )
+    a: Tensor = random_gce(size=size, dtype=dtype, device=device, batch_shape=batch_shape)
     q, r = th.linalg.qr(a)
     if random_phases:
-        d: Tensor = random_phd(
-            size=size, dtype=dtype, device=device, batch_shape=batch_shape
-        )
+        d: Tensor = random_phd(size=size, dtype=dtype, device=device, batch_shape=batch_shape)
     else:
         d: Tensor = r.diagonal(dim1=-2, dim2=-1)
         d: Tensor = th.diag_embed(d / th.abs(d))
@@ -124,10 +121,7 @@ def random_gue(
     device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
-    x: Tensor = (
-        random_gce(size=size, dtype=dtype, device=device, batch_shape=batch_shape)
-        * sigma
-    )
+    x: Tensor = random_gce(size=size, dtype=dtype, device=device, batch_shape=batch_shape) * sigma
     return (x + x.transpose(-2, -1).conj()) / msqrt(2)
 
 
@@ -138,10 +132,7 @@ def random_goe(
     device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
-    x: Tensor = (
-        random_gre(size=size, dtype=dtype, device=device, batch_shape=batch_shape)
-        * sigma
-    )
+    x: Tensor = random_gre(size=size, dtype=dtype, device=device, batch_shape=batch_shape) * sigma
     return (x + x.transpose(-2, -1)) / msqrt(2)
 
 
@@ -154,10 +145,7 @@ def random_wre(
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
     actual_size_m: int = size_m or size_n
-    x: Tensor = (
-        th.randn(*batch_shape, size_n, actual_size_m, dtype=dtype, device=device)
-        * sigma
-    )
+    x: Tensor = th.randn(*batch_shape, size_n, actual_size_m, dtype=dtype, device=device) * sigma
     return x @ x.transpose(-2, -1)
 
 
@@ -170,10 +158,7 @@ def random_wce(
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
     actual_size_m: int = size_m or size_n
-    x: Tensor = (
-        th.randn(*batch_shape, size_n, actual_size_m, dtype=dtype, device=device)
-        * sigma
-    )
+    x: Tensor = th.randn(*batch_shape, size_n, actual_size_m, dtype=dtype, device=device) * sigma
     return x @ x.transpose(-2, -1).conj()
 
 
@@ -187,13 +172,9 @@ def random_jre(
 ) -> Tensor:
     actual_size_m1: int = size_m1 or size_n
     actual_size_m2: int = size_m2 or size_n
-    x: Tensor = th.randn(
-        *batch_shape, size_n, actual_size_m1, dtype=dtype, device=device
-    )
+    x: Tensor = th.randn(*batch_shape, size_n, actual_size_m1, dtype=dtype, device=device)
     a1: Tensor = x @ x.transpose(-2, -1)
-    y: Tensor = th.randn(
-        *batch_shape, size_n, actual_size_m2, dtype=dtype, device=device
-    )
+    y: Tensor = th.randn(*batch_shape, size_n, actual_size_m2, dtype=dtype, device=device)
     a2: Tensor = a1 + y @ y.transpose(-2, -1)
     return a1 @ th.linalg.inv(a2)
 
@@ -208,12 +189,8 @@ def random_jce(
 ) -> Tensor:
     actual_size_m1: int = size_m1 or size_n
     actual_size_m2: int = size_m2 or size_n
-    x: Tensor = th.randn(
-        *batch_shape, size_n, actual_size_m1, dtype=dtype, device=device
-    )
+    x: Tensor = th.randn(*batch_shape, size_n, actual_size_m1, dtype=dtype, device=device)
     a1: Tensor = x @ x.transpose(-2, -1).conj()
-    y: Tensor = th.randn(
-        *batch_shape, size_n, actual_size_m2, dtype=dtype, device=device
-    )
+    y: Tensor = th.randn(*batch_shape, size_n, actual_size_m2, dtype=dtype, device=device)
     a2: Tensor = a1 + y @ y.transpose(-2, -1).conj()
     return a1 @ th.linalg.inv(a2)

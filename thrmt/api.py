@@ -78,9 +78,7 @@ def random_gre(
     check_size(size)
     check_dtype(dtype, real_dtypes)
     bs = () if batch_shape is None else batch_shape
-    return _random_gre(
-        size=size, nnorm=nnorm, dtype=dtype, device=device, batch_shape=bs
-    )
+    return _random_gre(size=size, nnorm=nnorm, dtype=dtype, device=device, batch_shape=bs)
 
 
 def random_gce(
@@ -117,9 +115,7 @@ def random_gce(
     check_size(size)
     check_dtype(dtype, complex_dtypes)
     bs = () if batch_shape is None else batch_shape
-    return _random_gce(
-        size=size, nnorm=nnorm, cnorm=cnorm, dtype=dtype, device=device, batch_shape=bs
-    )
+    return _random_gce(size=size, nnorm=nnorm, cnorm=cnorm, dtype=dtype, device=device, batch_shape=bs)
 
 
 # noinspection DuplicatedCode
@@ -237,9 +233,7 @@ def random_gue(
     check_dtype(dtype, complex_dtypes)
     check_sigma(sigma)
     bs = () if batch_shape is None else batch_shape
-    return _random_gue(
-        size=size, sigma=sigma, dtype=dtype, device=device, batch_shape=bs
-    )
+    return _random_gue(size=size, sigma=sigma, dtype=dtype, device=device, batch_shape=bs)
 
 
 def random_goe(
@@ -275,9 +269,7 @@ def random_goe(
     check_dtype(dtype, real_dtypes)
     check_sigma(sigma)
     bs = () if batch_shape is None else batch_shape
-    return _random_goe(
-        size=size, sigma=sigma, dtype=dtype, device=device, batch_shape=bs
-    )
+    return _random_goe(size=size, sigma=sigma, dtype=dtype, device=device, batch_shape=bs)
 
 
 # noinspection DuplicatedCode
