@@ -159,3 +159,7 @@ typeshed/
 
 # Ruff caches
 .ruff_cache/
+
+# Direnv
+.env.local
+.envrc

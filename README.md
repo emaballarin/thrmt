@@ -1,3 +1,3 @@
 # 🔥🎲 `ThRMT`
 
-*Torched* Random Matrix Theory
+_Torched_ Random Matrix Theory
