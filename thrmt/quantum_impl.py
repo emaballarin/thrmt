@@ -35,7 +35,8 @@ def random_rho_hs(
 ):
     x: Tensor = _random_gce(size=size, dtype=dtype, device=device, batch_shape=batch_shape)
     aad: Tensor = x @ x.transpose(-2, -1).conj()
-    return aad / aad.diagonal(offset=0, dim1=-2, dim2=-1).sum(-1)
+    trace: Tensor = aad.diagonal(offset=0, dim1=-2, dim2=-1).sum(-1)
+    return aad / trace[..., None, None]
 
 
 def random_rho_bh(
@@ -56,7 +57,8 @@ def random_rho_bh(
     beye: Tensor = th.diag_embed(th.ones(*batch_shape, size, dtype=dtype, device=device))
     x: Tensor = (beye + u) @ a
     aad: Tensor = x @ x.transpose(-2, -1).conj()
-    return aad / aad.diagonal(offset=0, dim1=-2, dim2=-1).sum(-1)
+    trace: Tensor = aad.diagonal(offset=0, dim1=-2, dim2=-1).sum(-1)
+    return aad / trace[..., None, None]
 
 
 def random_obs_gue(
