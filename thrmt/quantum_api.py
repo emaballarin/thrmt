@@ -192,7 +192,14 @@ def random_obs_cgi(
     batch_shape: Optional[Tuple[int, ...]] = None,
 ) -> Tensor:
     """
-    Generate a random observable (or a batch thereof) uniformly in the Gell-Mann parameterization of Hermitians.
+    Generate a random observable (or a batch thereof) uniformly in the Gell-Mann parameterisation of Hermitians.
+
+    The output is constructed as ``I / size + sum_i c_i G_i``, where the
+    ``G_i`` are the ``size**2 - 1`` generalised Gell-Mann generators of
+    ``su(size)`` and the ``c_i`` are i.i.d. uniform on
+    ``[coeff_low, coeff_upp]``. Since the ``G_i`` are traceless and
+    orthonormal, the output is exactly **unit-trace Hermitian** by
+    construction (``tr(H) = 1``).
 
     Parameters
     ----------
@@ -213,6 +220,14 @@ def random_obs_cgi(
     -------
     Tensor
         A random observable (or a batch thereof) uniformly w.r.t. the CGI measure.
+
+    Notes
+    -----
+    The output is unit-trace Hermitian but **not in general positive
+    semidefinite** (the ``c_i`` are unconstrained reals on a bounded
+    interval, not constrained to keep the spectrum non-negative), so it
+    is not a valid density matrix without an additional projection
+    onto the PSD cone.
     """
     check_size(size, disallow_equality=True)
     check_bounds(coeff_low, coeff_upp)
