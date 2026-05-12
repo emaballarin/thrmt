@@ -10,6 +10,7 @@ from typing import Tuple
 import torch as th
 from torch import Tensor
 
+from .auxiliary import check_dtype
 from .types import c2r_map
 from .types import complex_dtypes
 
@@ -70,14 +71,8 @@ def random_phd(
     device: Optional[th.device] = None,
     batch_shape: Tuple[int, ...] = (),
 ) -> Tensor:
-    return th.diag_embed(
-        th.exp(
-            1j
-            * 2
-            * th.pi
-            * th.rand(*batch_shape, size, dtype=(c2r_map[dtype] if dtype in complex_dtypes else dtype), device=device)
-        )
-    )
+    check_dtype(dtype, complex_dtypes)
+    return th.diag_embed(th.exp(1j * 2 * th.pi * th.rand(*batch_shape, size, dtype=c2r_map[dtype], device=device)))
 
 
 def random_cue(
